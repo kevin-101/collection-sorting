@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { columns, people } from "./columns";
+import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { useEffect, useState } from "react";
 
@@ -26,15 +25,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex flex-col gap-4">
-        <div className="flex justify-start">
-          <div className="flex gap-8">
-            <Button variant="destructive">Delete</Button>
-            <Button variant="outline">Add</Button>
-          </div>
-        </div>
-        <DataTable columns={columns} data={userData} />
-      </div>
+      <DataTable columns={columns} data={userData} setData={setUserData} />
     </>
   );
 }

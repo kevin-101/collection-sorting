@@ -1,9 +1,11 @@
 "use client";
 
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, Trash2, Pencil, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -13,6 +15,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogClose,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export const people = [
   {
@@ -83,6 +94,8 @@ export const people = [
   },
 ];
 
+const handleEdit = () => {};
+
 export const columns = [
   {
     id: "select",
@@ -150,7 +163,73 @@ export const columns = [
       const user = row.original;
 
       return (
-        <DropdownMenu>
+        <>
+          <div className="flex gap-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="secondary" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Edit Field</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
+                    <Input
+                      id="name"
+                      className="col-span-3"
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="username" className="text-right">
+                      Admission No
+                    </Label>
+                    <Input
+                      id="admission-no"
+                      className="col-span-3"
+                      onChange={(e) => setAdmissionNo(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="username" className="text-right">
+                      Amount
+                    </Label>
+                    <Input
+                      id="amount"
+                      className="col-span-3"
+                      onChange={(e) => setAmount(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="submit" onClick={handleEdit}>
+                      Edit
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Button
+              variant="destructive"
+              className="h-8 w-8 p-0"
+              onClick={() => table.options.meta.delete(row.index)}
+            >
+              <span className="sr-only">Open menu</span>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </>
+      );
+      {
+        /* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
@@ -159,17 +238,68 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <Dialog>
+              <DialogTrigger asChild>
+                <DropdownMenuItem
+                  onClick={() => navigator.clipboard.writeText(user.id)}
+                >
+                  Edit
+                </DropdownMenuItem>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Add Field</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
+                    <Input
+                      id="name"
+                      className="col-span-3"
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="username" className="text-right">
+                      Admission No
+                    </Label>
+                    <Input
+                      id="admission-no"
+                      className="col-span-3"
+                      onChange={(e) => setAdmissionNo(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="username" className="text-right">
+                      Amount
+                    </Label>
+                    <Input
+                      id="amount"
+                      className="col-span-3"
+                      onChange={(e) => setAmount(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="submit" onClick={handleEdit}>
+                      Add
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user.id)}
+              onClick={() => table.options.meta.delete(row.index)}
             >
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => user.delete()}>
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
-      );
+        </DropdownMenu> */
+      }
     },
   },
 ];
