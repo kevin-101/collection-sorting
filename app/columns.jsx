@@ -7,15 +7,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Dialog,
   DialogContent,
   DialogClose,
@@ -24,77 +15,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import updateData from "@/firebase/firestore/updateData";
+import RowActions from "@/components/row-actions";
 
-export const people = [
-  {
-    id: "728ed52f",
-    amount: 100,
-    name: "Kevin",
-    admission_no: "12234",
-  },
-  {
-    id: "489e1d42",
-    amount: 125,
-    name: "Tinu",
-    admission_no: "142134",
-  },
-  {
-    id: "0203942",
-    amount: 234,
-    name: "Bernard",
-    admission_no: "1231134",
-  },
-  {
-    id: "3653636",
-    amount: 234,
-    name: "Bernard",
-    admission_no: "1231134",
-  },
-  {
-    id: "2342545",
-    amount: 234,
-    name: "Bernard",
-    admission_no: "1231134",
-  },
-  {
-    id: "2354535",
-    amount: 234,
-    name: "Bernard",
-    admission_no: "1231134",
-  },
-  {
-    id: "235252",
-    amount: 234,
-    name: "Bernard",
-    admission_no: "1231134",
-  },
-  {
-    id: "2535253",
-    amount: 234,
-    name: "Bernard",
-    admission_no: "1231134",
-  },
-  {
-    id: "132423",
-    amount: 234,
-    name: "Bernard",
-    admission_no: "1231134",
-  },
-  {
-    id: "141414",
-    amount: 234,
-    name: "Bernard",
-    admission_no: "1231134",
-  },
-  {
-    id: "132e114",
-    amount: 234,
-    name: "Bernard",
-    admission_no: "1231134",
-  },
-];
+// let name;
+// let admission_no;
+// let amount;
 
-const handleEdit = () => {};
+// const handleEdit = (id, name, admission_no, amount) => {
+//   const newField = {
+//     name: name,
+//     admission_no: admission_no,
+//     amount: amount,
+//   };
+
+//   const { result, error } = updateData("users", id, newField);
+
+//   if (error) {
+//     return console.log(error);
+//   }
+//   console.log(result);
+// };
 
 export const columns = [
   {
@@ -165,7 +106,8 @@ export const columns = [
       return (
         <>
           <div className="flex gap-2">
-            <Dialog>
+            <RowActions rowProp={row} tableProp={table} userProp={user} />
+            {/* <Dialog>
               <DialogTrigger asChild>
                 <Button variant="secondary" className="h-8 w-8 p-0">
                   <span className="sr-only">Open menu</span>
@@ -184,7 +126,8 @@ export const columns = [
                     <Input
                       id="name"
                       className="col-span-3"
-                      onChange={(e) => setName(e.target.value)}
+                      defaultValue={user.name}
+                      onChange={(e) => (name = e.target.value)}
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
@@ -194,7 +137,8 @@ export const columns = [
                     <Input
                       id="admission-no"
                       className="col-span-3"
-                      onChange={(e) => setAdmissionNo(e.target.value)}
+                      defaultValue={user.admission_no}
+                      onChange={(e) => (admission_no = e.target.value)}
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
@@ -204,13 +148,16 @@ export const columns = [
                     <Input
                       id="amount"
                       className="col-span-3"
-                      onChange={(e) => setAmount(e.target.value)}
+                      defaultValue={user.amount}
+                      onChange={(e) => {
+                        amount = e.target.value;
+                      }}
                     />
                   </div>
                 </div>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button type="submit" onClick={handleEdit}>
+                    <Button type="submit" onClick={() => handleEdit(user.id)}>
                       Edit
                     </Button>
                   </DialogClose>
@@ -224,82 +171,10 @@ export const columns = [
             >
               <span className="sr-only">Open menu</span>
               <Trash2 className="h-4 w-4" />
-            </Button>
+            </Button> */}
           </div>
         </>
       );
-      {
-        /* <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <Dialog>
-              <DialogTrigger asChild>
-                <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(user.id)}
-                >
-                  Edit
-                </DropdownMenuItem>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Add Field</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                      Name
-                    </Label>
-                    <Input
-                      id="name"
-                      className="col-span-3"
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="username" className="text-right">
-                      Admission No
-                    </Label>
-                    <Input
-                      id="admission-no"
-                      className="col-span-3"
-                      onChange={(e) => setAdmissionNo(e.target.value)}
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="username" className="text-right">
-                      Amount
-                    </Label>
-                    <Input
-                      id="amount"
-                      className="col-span-3"
-                      onChange={(e) => setAmount(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button type="submit" onClick={handleEdit}>
-                      Add
-                    </Button>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-
-            <DropdownMenuItem
-              onClick={() => table.options.meta.delete(row.index)}
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu> */
-      }
     },
   },
 ];

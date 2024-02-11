@@ -45,7 +45,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export function DataTable({ columns, data, setData }) {
+import getDocument from "@/firebase/firestore/getData";
+import addData from "@/firebase/firestore/addData";
+import updateData from "@/firebase/firestore/updateData";
+import deleteData from "@/firebase/firestore/deleteData";
+
+export function DataTable({ columns, data, setData, isLoading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -62,28 +67,38 @@ export function DataTable({ columns, data, setData }) {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    autoResetPageIndex: false,
     meta: {
-      updateData: (rowIndex, columnId, value) => {
-        skipAutoResetPageIndex();
+      edit: async (id, name, admission_no, amount) => {
+        const newField = {
+          name: name,
+          admission_no: admission_no,
+          amount: Number(amount),
+        };
 
-        setData((old) =>
-          old.map((row, index) => {
-            if (index === rowIndex) {
-              return {
-                ...old[rowIndex],
-                [columnId]: value,
-              };
-            }
-            return row;
-          })
-        );
+        const { res, error } = await updateData("users", id, newField);
+
+        if (error) {
+          return console.log(error);
+        }
+        const { result, err } = await getDocument("users");
+
+        if (err) {
+          return console.log(err);
+        }
+        console.log(result);
+        setData([...result]);
       },
-      delete: (rowIndex) => {
-        setData((old) =>
-          old.filter((row, index) => {
-            return index !== rowIndex;
-          })
-        );
+      delete: async (id) => {
+        await deleteData("users", id);
+
+        const { result, err } = await getDocument("users");
+
+        if (err) {
+          return console.log(err);
+        }
+        console.log(result);
+        setData([...result]);
       },
     },
     state: {
@@ -99,15 +114,23 @@ export function DataTable({ columns, data, setData }) {
   const [admissionNo, setAdmissionNo] = React.useState("");
   const [amount, setAmount] = React.useState("");
 
-  const deleteSelected = () => {
+  const deleteSelected = async () => {
     if (table.getIsSomeRowsSelected() || table.getIsAllRowsSelected()) {
       const rows = table.getSelectedRowModel().rows;
+      const ids = rows.map((row) => row.original.id);
+      console.log(ids);
 
-      setData((old) =>
-        old.filter((row, i) => {
-          return i !== rows[i]?.index;
-        })
-      );
+      ids.forEach((id) => {
+        deleteData("users", id);
+      });
+
+      const { result, err } = await getDocument("users");
+
+      if (err) {
+        return console.log(err);
+      }
+      console.log(result);
+      setData([...result]);
 
       if (rows) {
         table.resetRowSelection();
@@ -116,19 +139,31 @@ export function DataTable({ columns, data, setData }) {
     }
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (name && admissionNo && amount) {
       const newField = {
-        id: Math.random() * 1000 + 1,
         name: name,
         admission_no: admissionNo,
-        amount: amount,
+        amount: Number(amount),
       };
 
-      setData((prev) => [...prev, newField]);
+      const { res, error } = await addData("users", newField);
+
+      // setData((prev) => [...prev, newField]);
       setName("");
       setAdmissionNo("");
       setAmount("");
+
+      if (error) {
+        return console.log(error);
+      }
+      const { result, err } = await getDocument("users");
+
+      if (err) {
+        return console.log(err);
+      }
+      console.log(result);
+      setData([...result]);
     }
   };
 
@@ -266,23 +301,21 @@ export function DataTable({ columns, data, setData }) {
                 ))
               ) : (
                 <TableRow>
-                  <React.Suspense
-                    fallback={
-                      <TableCell
-                        colSpan={columns.length}
-                        className="h-24 text-center"
-                      >
-                        Loading...
-                      </TableCell>
-                    }
-                  >
+                  {isLoading ? (
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      Loading...
+                    </TableCell>
+                  ) : (
                     <TableCell
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
                       No results.
                     </TableCell>
-                  </React.Suspense>
+                  )}
                 </TableRow>
               )}
             </TableBody>
