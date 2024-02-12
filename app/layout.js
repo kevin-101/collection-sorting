@@ -3,6 +3,8 @@ import "./globals.css";
 
 import { cn } from "@/lib/utils";
 
+import { Toaster } from "@/components/ui/sonner";
+
 export const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -23,6 +25,7 @@ export default function RootLayout({ children }) {
         )}
       >
         {children}
+        <Toaster richColors />
       </body>
     </html>
   );

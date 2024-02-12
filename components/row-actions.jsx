@@ -16,6 +16,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function RowActions({ rowProp, tableProp, userProp }) {
   const [name, setName] = React.useState(userProp.name);
@@ -64,6 +75,7 @@ export default function RowActions({ rowProp, tableProp, userProp }) {
               </Label>
               <Input
                 id="amount"
+                type="number"
                 className="col-span-3"
                 defaultValue={userProp.amount}
                 onChange={(e) => setAmount(e.target.value)}
@@ -89,14 +101,31 @@ export default function RowActions({ rowProp, tableProp, userProp }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Button
-        variant="destructive"
-        className="h-8 w-8 p-0"
-        onClick={() => tableProp.options.meta.delete(userProp.id)}
-      >
-        <span className="sr-only">Delete</span>
-        <Trash2 className="h-4 w-4" />
-      </Button>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button variant="destructive" className="h-8 w-8 p-0">
+            <span className="sr-only">Delete</span>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this
+              row.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => tableProp.options.meta.delete(userProp.id)}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

@@ -31,6 +31,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,10 +56,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import getDocument from "@/firebase/firestore/getData";
 import addData from "@/firebase/firestore/addData";
 import updateData from "@/firebase/firestore/updateData";
 import deleteData from "@/firebase/firestore/deleteData";
+
+import { toast } from "sonner";
 
 export function DataTable({ columns, data, setData, isLoading }) {
   const [sorting, setSorting] = React.useState([]);
@@ -76,29 +88,22 @@ export function DataTable({ columns, data, setData, isLoading }) {
           amount: Number(amount),
         };
 
-        const { res, error } = await updateData("users", id, newField);
+        const { result, error } = await updateData("users", id, newField);
 
         if (error) {
+          toast.error(error);
           return console.log(error);
         }
-        const { result, err } = await getDocument("users");
-
-        if (err) {
-          return console.log(err);
-        }
-        console.log(result);
-        setData([...result]);
+        toast.success("Row edited");
       },
       delete: async (id) => {
-        await deleteData("users", id);
+        const { result, error } = await deleteData("users", id);
 
-        const { result, err } = await getDocument("users");
-
-        if (err) {
-          return console.log(err);
+        if (error) {
+          toast.error(error);
+          return console.log(error);
         }
-        console.log(result);
-        setData([...result]);
+        toast.success("Row deleted");
       },
     },
     state: {
@@ -120,17 +125,16 @@ export function DataTable({ columns, data, setData, isLoading }) {
       const ids = rows.map((row) => row.original.id);
       console.log(ids);
 
-      ids.forEach((id) => {
-        deleteData("users", id);
-      });
+      try {
+        ids.forEach((id) => {
+          deleteData("users", id);
+        });
 
-      const { result, err } = await getDocument("users");
-
-      if (err) {
-        return console.log(err);
+        toast.success("Selected rows deleted");
+      } catch (error) {
+        toast.error(error);
+        console.log(error);
       }
-      console.log(result);
-      setData([...result]);
 
       if (rows) {
         table.resetRowSelection();
@@ -147,23 +151,17 @@ export function DataTable({ columns, data, setData, isLoading }) {
         amount: Number(amount),
       };
 
-      const { res, error } = await addData("users", newField);
+      const { result, error } = await addData("users", newField);
 
-      // setData((prev) => [...prev, newField]);
       setName("");
       setAdmissionNo("");
       setAmount("");
 
       if (error) {
+        toast.error(error);
         return console.log(error);
       }
-      const { result, err } = await getDocument("users");
-
-      if (err) {
-        return console.log(err);
-      }
-      console.log(result);
-      setData([...result]);
+      toast.success("Row added");
     }
   };
 
@@ -171,9 +169,31 @@ export function DataTable({ columns, data, setData, isLoading }) {
     <div className="flex flex-col gap-4">
       <div className="flex justify-start">
         <div className="flex gap-8">
-          <Button variant="destructive" onClick={deleteSelected}>
-            Delete
-          </Button>
+          {table.getIsSomeRowsSelected() || table.getIsAllRowsSelected() ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">Delete</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    the selected rows.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={deleteSelected}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <Button variant="destructive">Delete</Button>
+          )}
+
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline">Add</Button>
@@ -209,6 +229,7 @@ export function DataTable({ columns, data, setData, isLoading }) {
                   </Label>
                   <Input
                     id="amount"
+                    type="number"
                     className="col-span-3"
                     onChange={(e) => setAmount(e.target.value)}
                   />
@@ -225,6 +246,7 @@ export function DataTable({ columns, data, setData, isLoading }) {
           </Dialog>
         </div>
       </div>
+
       <div className="w-full">
         <div className="flex items-center pb-4">
           <Input

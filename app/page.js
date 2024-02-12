@@ -1,6 +1,14 @@
 "use client";
 
-import getDocument from "@/firebase/firestore/getData";
+import firebaseApp from "@/firebase/config";
+
+import {
+  getFirestore,
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
 
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
@@ -10,34 +18,25 @@ export default function Home() {
   const [userData, setUserData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getUsers = async () => {
-    const { result, error } = await getDocument("users");
-
-    if (error) {
-      setIsLoading(false);
-      return console.log(error);
-    }
-    console.log(result);
-    setUserData([...result]);
-    setIsLoading(false);
-  };
+  const db = getFirestore(firebaseApp);
 
   useEffect(() => {
-    getUsers();
-    // fetch(`https://65c70e85e7c384aada6e25cb.mockapi.io/users`, {
-    //   method: "GET",
-    //   headers: { "content-type": "application/json" },
-    // })
-    //   .then((res) => {
-    //     if (res.ok) {
-    //       return res.json();
-    //     }
-    //   })
-    //   .then((users) => {
-    //     setUserData([...users]);
-    //     setIsLoading(false);
-    //     console.log(users);
-    //   });
+    const usersRef = collection(db, "users");
+
+    const q = query(usersRef, orderBy("amount", "desc"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ ...doc.data(), id: doc.id });
+      });
+
+      setUserData(data);
+      setIsLoading(false);
+    });
+
+    return () => {
+      unsubscribe && unsubscribe();
+    };
   }, []);
 
   return (

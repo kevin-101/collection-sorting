@@ -5,6 +5,7 @@ import {
   getDocs,
   query,
   orderBy,
+  onSnapshot,
 } from "firebase/firestore";
 
 const db = getFirestore(firebase_app);
@@ -17,8 +18,11 @@ export default async function getDocument(coll) {
 
   try {
     const q = query(collectionRef, orderBy("amount", "desc"));
-    const querySnapshot = await getDocs(q);
-    result = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      result = querySnapshot.map((doc) => ({ ...doc.data(), id: doc.id }));
+    });
+    // const querySnapshot = await getDocs(q);
+    // result = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
     console.log(result);
   } catch (e) {
     error = e;
