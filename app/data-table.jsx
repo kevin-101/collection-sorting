@@ -2,10 +2,6 @@
 
 import * as React from "react";
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -17,9 +13,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -62,7 +55,7 @@ import deleteData from "@/firebase/firestore/deleteData";
 
 import { toast } from "sonner";
 
-export function DataTable({ columns, data, setData, isLoading }) {
+export function DataTable({ columns, data, collection, isLoading, isAdmin }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -88,7 +81,7 @@ export function DataTable({ columns, data, setData, isLoading }) {
           amount: Number(amount),
         };
 
-        const { result, error } = await updateData("users", id, newField);
+        const { result, error } = await updateData(collection, id, newField);
 
         if (error) {
           toast.error(error);
@@ -97,7 +90,7 @@ export function DataTable({ columns, data, setData, isLoading }) {
         toast.success("Row edited");
       },
       delete: async (id) => {
-        const { result, error } = await deleteData("users", id);
+        const { result, error } = await deleteData(collection, id);
 
         if (error) {
           toast.error(error);
@@ -127,7 +120,7 @@ export function DataTable({ columns, data, setData, isLoading }) {
 
       try {
         ids.forEach((id) => {
-          deleteData("users", id);
+          deleteData(collection, id);
         });
 
         toast.success("Selected rows deleted");
@@ -151,7 +144,7 @@ export function DataTable({ columns, data, setData, isLoading }) {
         amount: Number(amount),
       };
 
-      const { result, error } = await addData("users", newField);
+      const { result, error } = await addData(collection, newField);
 
       setName("");
       setAdmissionNo("");
@@ -167,85 +160,89 @@ export function DataTable({ columns, data, setData, isLoading }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-start">
-        <div className="flex gap-8">
-          {table.getIsSomeRowsSelected() || table.getIsAllRowsSelected() ? (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive">Delete</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    the selected rows.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={deleteSelected}>
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          ) : (
-            <Button variant="destructive">Delete</Button>
-          )}
+      {isAdmin && (
+        <div className="flex justify-start">
+          <div className="flex gap-8">
+            {table.getIsSomeRowsSelected() || table.getIsAllRowsSelected() ? (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">Delete</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      the selected rows.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={deleteSelected}>
+                      Continue
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            ) : (
+              <Button variant="destructive">Delete</Button>
+            )}
 
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">Add</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Add Field</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <Input
-                    id="name"
-                    className="col-span-3"
-                    onChange={(e) => setName(e.target.value)}
-                  />
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">Add</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Add Field</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
+                    <Input
+                      id="name"
+                      className="col-span-3"
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="username" className="text-right">
+                      Admission No
+                    </Label>
+                    <Input
+                      id="admission-no"
+                      className="col-span-3"
+                      onChange={(e) => setAdmissionNo(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="username" className="text-right">
+                      Amount
+                    </Label>
+                    <Input
+                      id="amount"
+                      type="number"
+                      className="col-span-3"
+                      onChange={(e) => setAmount(e.target.value)}
+                    />
+                  </div>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="username" className="text-right">
-                    Admission No
-                  </Label>
-                  <Input
-                    id="admission-no"
-                    className="col-span-3"
-                    onChange={(e) => setAdmissionNo(e.target.value)}
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="username" className="text-right">
-                    Amount
-                  </Label>
-                  <Input
-                    id="amount"
-                    type="number"
-                    className="col-span-3"
-                    onChange={(e) => setAmount(e.target.value)}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button type="submit" onClick={handleAdd}>
-                    Add
-                  </Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="submit" onClick={handleAdd}>
+                      Add
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="w-full">
         <div className="flex items-center pb-4">
