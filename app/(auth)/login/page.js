@@ -55,7 +55,7 @@ export default function Login() {
               Email
             </Label>
             <Input
-              id="password"
+              id="email"
               type="email"
               className="col-span-3"
               onChange={(e) => setEmail(e.target.value)}

@@ -245,7 +245,7 @@ export function DataTable({ columns, data, collection, isLoading, isAdmin }) {
       )}
 
       <div className="w-full">
-        <div className="flex items-center pb-4">
+        <div className="flex items-center pb-4 gap-4">
           <Input
             placeholder="Search..."
             value={table.getColumn("name")?.getFilterValue() ?? ""}

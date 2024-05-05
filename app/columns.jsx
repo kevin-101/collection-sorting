@@ -70,12 +70,14 @@ export const adminColumns = [
     id: "actions",
     enableHiding: false,
     cell: ({ row, table }) => {
-      const user = row.original;
-
       return (
         <>
           <div className="flex gap-2">
-            <RowActions rowProp={row} tableProp={table} userProp={user} />
+            <RowActions
+              rowProp={row}
+              tableProp={table}
+              userProp={row.original}
+            />
           </div>
         </>
       );
