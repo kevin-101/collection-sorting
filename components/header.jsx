@@ -34,16 +34,16 @@ export default function Header() {
 
   return (
     <>
-      <div className="w-full flex justify-end pt-2">
+      <div className="w-full flex justify-end pt-2 px-6">
         {isSignedIn ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Avatar className="cursor-pointer mr-6 w-12 h-12">
+              <Avatar className="cursor-pointer w-12 h-12">
                 <AvatarImage src="" />
                 <AvatarFallback>AD</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem

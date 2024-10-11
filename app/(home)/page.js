@@ -53,7 +53,7 @@ export default function Home() {
   }, [colllection]);
 
   return (
-    <>
+    <div className="px-6">
       {isSignedIn ? (
         <DataTable
           columns={adminColumns}
@@ -71,6 +71,6 @@ export default function Home() {
           isAdmin={isSignedIn}
         />
       )}
-    </>
+    </div>
   );
 }

@@ -29,9 +29,9 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function RowActions({ rowProp, tableProp, userProp }) {
-  const [name, setName] = React.useState(userProp.name);
-  const [admissionNo, setAdmissionNo] = React.useState(userProp.admission_no);
-  const [amount, setAmount] = React.useState(userProp.amount);
+  const nameRef = React.useRef();
+  const admissionNoRef = React.useRef();
+  const amountRef = React.useRef();
 
   return (
     <>
@@ -52,10 +52,10 @@ export default function RowActions({ rowProp, tableProp, userProp }) {
                 Name
               </Label>
               <Input
+                ref={nameRef}
                 id="name"
                 className="col-span-3"
                 defaultValue={userProp.name}
-                onChange={(e) => setName(e.target.value)}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -63,10 +63,10 @@ export default function RowActions({ rowProp, tableProp, userProp }) {
                 Admission No
               </Label>
               <Input
+                ref={admissionNoRef}
                 id="admission-no"
                 className="col-span-3"
                 defaultValue={userProp.admission_no}
-                onChange={(e) => setAdmissionNo(e.target.value)}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -74,11 +74,11 @@ export default function RowActions({ rowProp, tableProp, userProp }) {
                 Amount
               </Label>
               <Input
+                ref={amountRef}
                 id="amount"
                 type="number"
                 className="col-span-3"
                 defaultValue={userProp.amount}
-                onChange={(e) => setAmount(e.target.value)}
               />
             </div>
           </div>
@@ -86,14 +86,14 @@ export default function RowActions({ rowProp, tableProp, userProp }) {
             <DialogClose asChild>
               <Button
                 type="submit"
-                onClick={() =>
+                onClick={() => {
                   tableProp.options.meta.edit(
                     userProp.id,
-                    name,
-                    admissionNo,
-                    amount
-                  )
-                }
+                    nameRef.current.value,
+                    admissionNoRef.current.value,
+                    amountRef.current.value
+                  );
+                }}
               >
                 Edit
               </Button>

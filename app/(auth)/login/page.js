@@ -32,9 +32,7 @@ export default function Login() {
       signInWithEmailAndPassword(auth, email, password)
         .then(() => {
           toast.success("Logged in successfully");
-          setTimeout(() => {
-            router.push("/");
-          }, 1000);
+          router.push("/");
         })
         .catch((error) => {
           toast.error(error.message);
